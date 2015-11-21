@@ -69,7 +69,7 @@ namespace MonitorNodes
             worker.DoWork += new System.ComponentModel.DoWorkEventHandler(testConnection);
             worker.WorkerSupportsCancellation = true;
             worker.RunWorkerAsync();
-            myIPAddress.Text = System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName()).AddressList[0].ToString();
+            myIPAddress.Text = System.Net.Dns.GetHostEntry(System.Net.Dns.GetHostName()).AddressList.Where(o => o.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork).First().ToString();
 
 
         }
@@ -174,7 +174,9 @@ namespace MonitorNodes
 
                         }
 
-                        if (/*reply != null &&*/ reply.Status.ToString().Contains("Success") && reply.Options.Ttl.ToString() != null )
+                        
+
+                        if (/*reply != null &&*/ reply.Status.ToString().Contains("Success"))
                         {
                             
                             canConnect = true;
@@ -798,7 +800,10 @@ namespace MonitorNodes
             ipAddress = null;
         }
 
-
+        private void viewSourceCodeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("https://github.com/martinoj2009/Monitor-Node/blob/master/MonitorNodes/Form1.cs");
+        }
     }
 
 

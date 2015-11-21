@@ -71,6 +71,7 @@
             this.maxTimeOutCounter = new System.Windows.Forms.Label();
             this.addressLabel = new System.Windows.Forms.Label();
             this.myIPAddress = new System.Windows.Forms.Label();
+            this.viewSourceCodeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pingChart)).BeginInit();
             this.SuspendLayout();
@@ -295,7 +296,8 @@
             this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.aboutToolStripMenuItem,
             this.changeLogToolStripMenuItem,
-            this.checkForUpdateToolStripMenuItem});
+            this.checkForUpdateToolStripMenuItem,
+            this.viewSourceCodeToolStripMenuItem});
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.helpToolStripMenuItem.Text = "Help";
@@ -303,21 +305,21 @@
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
             // changeLogToolStripMenuItem
             // 
             this.changeLogToolStripMenuItem.Name = "changeLogToolStripMenuItem";
-            this.changeLogToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            this.changeLogToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
             this.changeLogToolStripMenuItem.Text = "Changelog";
             this.changeLogToolStripMenuItem.Click += new System.EventHandler(this.changeLogToolStripMenuItem_Click);
             // 
             // checkForUpdateToolStripMenuItem
             // 
             this.checkForUpdateToolStripMenuItem.Name = "checkForUpdateToolStripMenuItem";
-            this.checkForUpdateToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            this.checkForUpdateToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
             this.checkForUpdateToolStripMenuItem.Text = "Check for update";
             this.checkForUpdateToolStripMenuItem.Click += new System.EventHandler(this.checkForUpdateToolStripMenuItem_Click);
             // 
@@ -438,6 +440,13 @@
             this.myIPAddress.TabIndex = 23;
             this.myIPAddress.Text = "127.0.0.1";
             // 
+            // viewSourceCodeToolStripMenuItem
+            // 
+            this.viewSourceCodeToolStripMenuItem.Name = "viewSourceCodeToolStripMenuItem";
+            this.viewSourceCodeToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
+            this.viewSourceCodeToolStripMenuItem.Text = "View Source Code";
+            this.viewSourceCodeToolStripMenuItem.Click += new System.EventHandler(this.viewSourceCodeToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AcceptButton = this.monitorButton;
@@ -525,6 +534,7 @@
         private System.Windows.Forms.Label maxTimeOutCounter;
         private System.Windows.Forms.Label addressLabel;
         private System.Windows.Forms.Label myIPAddress;
+        private System.Windows.Forms.ToolStripMenuItem viewSourceCodeToolStripMenuItem;
     }
 }
 
