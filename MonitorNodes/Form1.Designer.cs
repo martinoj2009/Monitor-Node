@@ -35,7 +35,6 @@
             this.ipAddressBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.monitorButton = new System.Windows.Forms.Button();
-            this.listBox1 = new System.Windows.Forms.ListBox();
             this.stopButton = new System.Windows.Forms.Button();
             this.waitTime = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -58,6 +57,7 @@
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.changeLogToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.checkForUpdateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.viewSourceCodeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.reliabilityLabel = new System.Windows.Forms.Label();
             this.reliabilityCounter = new System.Windows.Forms.Label();
             this.succeedLabel = new System.Windows.Forms.Label();
@@ -71,9 +71,19 @@
             this.maxTimeOutCounter = new System.Windows.Forms.Label();
             this.addressLabel = new System.Windows.Forms.Label();
             this.myIPAddress = new System.Windows.Forms.Label();
-            this.viewSourceCodeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.dgv1 = new System.Windows.Forms.DataGridView();
+            this.Status = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.IP = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Time = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.RTT = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Timeout = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.TTL = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.oslabelTitle = new System.Windows.Forms.Label();
+            this.osLabel = new System.Windows.Forms.Label();
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pingChart)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgv1)).BeginInit();
             this.SuspendLayout();
             // 
             // ipAddressBox
@@ -104,18 +114,6 @@
             this.monitorButton.Text = "Monitor";
             this.monitorButton.UseVisualStyleBackColor = true;
             this.monitorButton.Click += new System.EventHandler(this.monitorButton_Click);
-            // 
-            // listBox1
-            // 
-            this.listBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(12, 84);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-            this.listBox1.Size = new System.Drawing.Size(376, 299);
-            this.listBox1.TabIndex = 3;
-            this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
-            this.listBox1.MouseHover += new System.EventHandler(this.listBox1_MouseHover);
             // 
             // stopButton
             // 
@@ -323,10 +321,17 @@
             this.checkForUpdateToolStripMenuItem.Text = "Check for update";
             this.checkForUpdateToolStripMenuItem.Click += new System.EventHandler(this.checkForUpdateToolStripMenuItem_Click);
             // 
+            // viewSourceCodeToolStripMenuItem
+            // 
+            this.viewSourceCodeToolStripMenuItem.Name = "viewSourceCodeToolStripMenuItem";
+            this.viewSourceCodeToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
+            this.viewSourceCodeToolStripMenuItem.Text = "View Source Code";
+            this.viewSourceCodeToolStripMenuItem.Click += new System.EventHandler(this.viewSourceCodeToolStripMenuItem_Click);
+            // 
             // reliabilityLabel
             // 
             this.reliabilityLabel.AutoSize = true;
-            this.reliabilityLabel.Location = new System.Drawing.Point(394, 98);
+            this.reliabilityLabel.Location = new System.Drawing.Point(496, 100);
             this.reliabilityLabel.Name = "reliabilityLabel";
             this.reliabilityLabel.Size = new System.Drawing.Size(54, 13);
             this.reliabilityLabel.TabIndex = 12;
@@ -335,7 +340,7 @@
             // reliabilityCounter
             // 
             this.reliabilityCounter.AutoSize = true;
-            this.reliabilityCounter.Location = new System.Drawing.Point(453, 98);
+            this.reliabilityCounter.Location = new System.Drawing.Point(555, 100);
             this.reliabilityCounter.Name = "reliabilityCounter";
             this.reliabilityCounter.Size = new System.Drawing.Size(13, 13);
             this.reliabilityCounter.TabIndex = 13;
@@ -344,7 +349,7 @@
             // succeedLabel
             // 
             this.succeedLabel.AutoSize = true;
-            this.succeedLabel.Location = new System.Drawing.Point(394, 123);
+            this.succeedLabel.Location = new System.Drawing.Point(496, 125);
             this.succeedLabel.Name = "succeedLabel";
             this.succeedLabel.Size = new System.Drawing.Size(53, 13);
             this.succeedLabel.TabIndex = 14;
@@ -353,7 +358,7 @@
             // succeedCounter
             // 
             this.succeedCounter.AutoSize = true;
-            this.succeedCounter.Location = new System.Drawing.Point(453, 123);
+            this.succeedCounter.Location = new System.Drawing.Point(555, 125);
             this.succeedCounter.Name = "succeedCounter";
             this.succeedCounter.Size = new System.Drawing.Size(13, 13);
             this.succeedCounter.TabIndex = 15;
@@ -362,7 +367,7 @@
             // failLabel
             // 
             this.failLabel.AutoSize = true;
-            this.failLabel.Location = new System.Drawing.Point(394, 151);
+            this.failLabel.Location = new System.Drawing.Point(496, 153);
             this.failLabel.Name = "failLabel";
             this.failLabel.Size = new System.Drawing.Size(38, 13);
             this.failLabel.TabIndex = 16;
@@ -371,7 +376,7 @@
             // failCounter
             // 
             this.failCounter.AutoSize = true;
-            this.failCounter.Location = new System.Drawing.Point(438, 151);
+            this.failCounter.Location = new System.Drawing.Point(540, 153);
             this.failCounter.Name = "failCounter";
             this.failCounter.Size = new System.Drawing.Size(13, 13);
             this.failCounter.TabIndex = 17;
@@ -392,7 +397,6 @@
             this.pingChart.Size = new System.Drawing.Size(358, 336);
             this.pingChart.TabIndex = 18;
             this.pingChart.Text = "Ping Chart";
-            this.pingChart.MouseLeave += new System.EventHandler(this.pingChart_MouseLeave);
             // 
             // showFailsOnly
             // 
@@ -407,7 +411,7 @@
             // maxTimeOutLabel
             // 
             this.maxTimeOutLabel.AutoSize = true;
-            this.maxTimeOutLabel.Location = new System.Drawing.Point(395, 178);
+            this.maxTimeOutLabel.Location = new System.Drawing.Point(497, 180);
             this.maxTimeOutLabel.Name = "maxTimeOutLabel";
             this.maxTimeOutLabel.Size = new System.Drawing.Size(74, 13);
             this.maxTimeOutLabel.TabIndex = 20;
@@ -416,7 +420,7 @@
             // maxTimeOutCounter
             // 
             this.maxTimeOutCounter.AutoSize = true;
-            this.maxTimeOutCounter.Location = new System.Drawing.Point(476, 178);
+            this.maxTimeOutCounter.Location = new System.Drawing.Point(578, 180);
             this.maxTimeOutCounter.Name = "maxTimeOutCounter";
             this.maxTimeOutCounter.Size = new System.Drawing.Size(13, 13);
             this.maxTimeOutCounter.TabIndex = 21;
@@ -425,7 +429,7 @@
             // addressLabel
             // 
             this.addressLabel.AutoSize = true;
-            this.addressLabel.Location = new System.Drawing.Point(398, 206);
+            this.addressLabel.Location = new System.Drawing.Point(496, 207);
             this.addressLabel.Name = "addressLabel";
             this.addressLabel.Size = new System.Drawing.Size(64, 13);
             this.addressLabel.TabIndex = 22;
@@ -434,18 +438,84 @@
             // myIPAddress
             // 
             this.myIPAddress.AutoSize = true;
-            this.myIPAddress.Location = new System.Drawing.Point(469, 205);
+            this.myIPAddress.Location = new System.Drawing.Point(496, 232);
             this.myIPAddress.Name = "myIPAddress";
             this.myIPAddress.Size = new System.Drawing.Size(52, 13);
             this.myIPAddress.TabIndex = 23;
             this.myIPAddress.Text = "127.0.0.1";
             // 
-            // viewSourceCodeToolStripMenuItem
+            // dgv1
             // 
-            this.viewSourceCodeToolStripMenuItem.Name = "viewSourceCodeToolStripMenuItem";
-            this.viewSourceCodeToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
-            this.viewSourceCodeToolStripMenuItem.Text = "View Source Code";
-            this.viewSourceCodeToolStripMenuItem.Click += new System.EventHandler(this.viewSourceCodeToolStripMenuItem_Click);
+            this.dgv1.AllowUserToAddRows = false;
+            this.dgv1.AllowUserToDeleteRows = false;
+            this.dgv1.AllowUserToOrderColumns = true;
+            this.dgv1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgv1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Status,
+            this.IP,
+            this.Time,
+            this.RTT,
+            this.Timeout,
+            this.TTL});
+            this.dgv1.Location = new System.Drawing.Point(12, 84);
+            this.dgv1.Name = "dgv1";
+            this.dgv1.ReadOnly = true;
+            this.dgv1.Size = new System.Drawing.Size(478, 310);
+            this.dgv1.TabIndex = 24;
+            // 
+            // Status
+            // 
+            this.Status.HeaderText = "Status";
+            this.Status.Name = "Status";
+            this.Status.ReadOnly = true;
+            // 
+            // IP
+            // 
+            this.IP.HeaderText = "IP";
+            this.IP.Name = "IP";
+            this.IP.ReadOnly = true;
+            // 
+            // Time
+            // 
+            this.Time.HeaderText = "Time";
+            this.Time.Name = "Time";
+            this.Time.ReadOnly = true;
+            // 
+            // RTT
+            // 
+            this.RTT.HeaderText = "RTT";
+            this.RTT.Name = "RTT";
+            this.RTT.ReadOnly = true;
+            // 
+            // Timeout
+            // 
+            this.Timeout.HeaderText = "Timeout";
+            this.Timeout.Name = "Timeout";
+            this.Timeout.ReadOnly = true;
+            // 
+            // TTL
+            // 
+            this.TTL.HeaderText = "TTL";
+            this.TTL.Name = "TTL";
+            this.TTL.ReadOnly = true;
+            // 
+            // oslabelTitle
+            // 
+            this.oslabelTitle.AutoSize = true;
+            this.oslabelTitle.Location = new System.Drawing.Point(497, 264);
+            this.oslabelTitle.Name = "oslabelTitle";
+            this.oslabelTitle.Size = new System.Drawing.Size(28, 13);
+            this.oslabelTitle.TabIndex = 25;
+            this.oslabelTitle.Text = "OS: ";
+            // 
+            // osLabel
+            // 
+            this.osLabel.AutoSize = true;
+            this.osLabel.Location = new System.Drawing.Point(527, 264);
+            this.osLabel.Name = "osLabel";
+            this.osLabel.Size = new System.Drawing.Size(38, 13);
+            this.osLabel.TabIndex = 26;
+            this.osLabel.Text = "NONE";
             // 
             // Form1
             // 
@@ -454,6 +524,9 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.stopButton;
             this.ClientSize = new System.Drawing.Size(967, 429);
+            this.Controls.Add(this.osLabel);
+            this.Controls.Add(this.oslabelTitle);
+            this.Controls.Add(this.dgv1);
             this.Controls.Add(this.myIPAddress);
             this.Controls.Add(this.addressLabel);
             this.Controls.Add(this.maxTimeOutCounter);
@@ -473,7 +546,6 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.waitTime);
             this.Controls.Add(this.stopButton);
-            this.Controls.Add(this.listBox1);
             this.Controls.Add(this.monitorButton);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.ipAddressBox);
@@ -488,6 +560,7 @@
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pingChart)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgv1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -498,7 +571,6 @@
         private System.Windows.Forms.TextBox ipAddressBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button monitorButton;
-        private System.Windows.Forms.ListBox listBox1;
         private System.Windows.Forms.Button stopButton;
         private System.Windows.Forms.ComboBox waitTime;
         private System.Windows.Forms.Label label2;
@@ -535,6 +607,16 @@
         private System.Windows.Forms.Label addressLabel;
         private System.Windows.Forms.Label myIPAddress;
         private System.Windows.Forms.ToolStripMenuItem viewSourceCodeToolStripMenuItem;
+        private System.Windows.Forms.DataGridView dgv1;
+        private System.Windows.Forms.Label oslabelTitle;
+        private System.Windows.Forms.Label osLabel;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Status;
+        private System.Windows.Forms.DataGridViewTextBoxColumn IP;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Time;
+        private System.Windows.Forms.DataGridViewTextBoxColumn RTT;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Timeout;
+        private System.Windows.Forms.DataGridViewTextBoxColumn TTL;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
     }
 }
 

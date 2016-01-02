@@ -33,6 +33,9 @@ namespace MonitorNodes
             this.KeyDown += new KeyEventHandler(Form1_KeyDown);
             checkForUpdate();
 
+            this.dgv1.Sort(this.dgv1.Columns["Time"], System.ComponentModel.ListSortDirection.Descending);
+
+
         }
 
         //This is a variable is for tracking the wait time the user sets. 
@@ -42,6 +45,7 @@ namespace MonitorNodes
         //bool pieChart = false;
         ToolTip t1 = new ToolTip();
         bool showGraph = true;
+
         
 
         private void monitorButton_Click(object sender, EventArgs e)
@@ -62,8 +66,8 @@ namespace MonitorNodes
             ipAddressBox.Enabled = false;
             stopButton.Enabled = true;
             userWaitTime = Convert.ToInt16(waitTime.SelectedItem.ToString());
-            listBox1.Items.Add("Sleep time has been set to: " + userWaitTime + " seconds.");
-            listBox1.Items.Add("Testing: " + ipAddressBox.Text);
+            //listBox1.Items.Add("Sleep time has been set to: " + userWaitTime + " seconds.");
+            //listBox1.Items.Add("Testing: " + ipAddressBox.Text);
             waitTime.Enabled = false;
             worker = new System.ComponentModel.BackgroundWorker();
             worker.DoWork += new System.ComponentModel.DoWorkEventHandler(testConnection);
@@ -79,7 +83,8 @@ namespace MonitorNodes
         private void testConnection(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
             //listbox.TopIndex = listbox.Items.Count - 1;
-            listBox1.Invoke(new Action(() => listBox1.Items.Add(" Start! ")));
+            dgv1.Invoke(new Action(() => dgv1.Rows.Add(" Start! ")));
+            //listBox1.Invoke(new Action(() => listBox1.Items.Add(" Start! ")));
             //bool to determin if the while loop has run once for things I want to do ONE time
             bool checkedOS = true;
             string osVersion = null;
@@ -91,6 +96,7 @@ namespace MonitorNodes
             bool canConnect = false;
             while (true)
             {
+                dgv1.RefreshEdit();
                 //Check to see if the worker has been cancled. 
                 if (worker.CancellationPending == true)
                 {
@@ -98,9 +104,12 @@ namespace MonitorNodes
                     return;
                 }
                 
+                //I'm going to instead look at putting this data into a SQLite database.
                 //This is to warn if the program is eating up TOO much memory, 50MB is the warning.
+                
                 if(System.Diagnostics.Process.GetCurrentProcess().WorkingSet64 >= maxMem)
                 {
+                    /*
                     string answerToContinue = MessageBox.Show("Warning, the application is taking up 100MB or more, would you like to continue? If you say yes then the error will show again at " + maxMem + " bytes", "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation).ToString();
                     if(answerToContinue == "No")
                     {
@@ -111,10 +120,14 @@ namespace MonitorNodes
                     {
                         maxMem = maxMem * 2;
                     }
+                    
 
                     //Null item
                     answerToContinue = null;
+                    */
+
                 }
+                
                 
                 //Do this once if check OS is checked
                 if (checkedOS == true && attemptOSVersion.Checked == true)
@@ -123,10 +136,7 @@ namespace MonitorNodes
                     checkedOS = false;
                 }
                 //Check to see if they want auto scroll, if so then scroll
-                if(autoScroll.Checked == true)
-                {
-                    listBox1.Invoke(new Action(() => listBox1.TopIndex = listBox1.Items.Count - 1));
-                }
+
 
                 //Get ping info
                 string pingInfo = "";
@@ -140,10 +150,13 @@ namespace MonitorNodes
                 {
                     try
                     {
+                        //Setup for ping
                         System.Net.NetworkInformation.Ping myPing = new System.Net.NetworkInformation.Ping();
                         String host = null;
 
-                        if (forceIPv4 == true)
+                        //If the user wants IPv4 then force it.
+                        System.Net.IPAddress address;
+                        if (forceIPv4 == true && System.Net.IPAddress.TryParse(ipAddressBox.Text, out address) != true)
                         {
                             host = Array.FindAll(System.Net.Dns.GetHostEntry(ipAddressBox.Text).AddressList, a => a.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)[0].ToString();
                         }
@@ -152,13 +165,14 @@ namespace MonitorNodes
                             host = ipAddressBox.Text;
                         }
                         
-
+                        //Do the actual ping
                         byte[] buffer = new byte[32];
                         System.Net.NetworkInformation.PingOptions pingOptions = new System.Net.NetworkInformation.PingOptions();
 
                         System.Net.NetworkInformation.PingReply reply = null;
                         try
                         {
+                            //Stopwatch for the milliseconds for the ping
                             System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
                             stopwatch.Start();
                             reply = myPing.Send(host, 1000, buffer, pingOptions);
@@ -168,8 +182,8 @@ namespace MonitorNodes
                         }
                         catch(Exception)
                         {
-                            //MessageBox.Show("Error sending ping: " + ex.Message);
-                            listBox1.Invoke(new Action(() => listBox1.Items.Add("Cannot find IP address of the hostname: " + ipAddressBox.Text)));
+                            
+                           // listBox1.Invoke(new Action(() => listBox1.Items.Add("Cannot find IP address of the hostname: " + ipAddressBox.Text)));
                             canConnect = false;
 
                         }
@@ -213,6 +227,8 @@ namespace MonitorNodes
 
                 if (canConnect == true)
                 {
+
+
                     if (showFailsOnly.Checked == false)
                     {
                         //This is what's printed to the screen
@@ -225,29 +241,38 @@ namespace MonitorNodes
                         {
 
                         }
+                        string putItem = DateTime.Now + " " + hostIP + " " + pingInfo + " ";
 
-                        listBox1.Invoke(new Action(() => listBox1.Items.Add("IP Address: " + hostIP)));
-                        listBox1.Invoke(new Action(() => listBox1.Items.Add(DateTime.Now + "  " + (ipAddressBox.Text) + " is " + "UP")));
-                        listBox1.Invoke(new Action(() => listBox1.Items.Add("Round Trip Time: " + pingInfo)));
-                        if (pingTimeOut >= 0) { listBox1.Invoke(new Action(() => listBox1.Items.Add(pingTimeOut.ToString() + " milliseconds"))); }
-                        
+
+
+                        dgv1.Invoke(new Action(() => dgv1.Rows.Add("UP", hostIP, DateTime.Now, pingInfo, pingTimeOut.ToString() + " milliseconds", pingTTL)));
+                        //listBox1.Invoke(new Action(() => listBox1.Items.Add("IP Address: " + hostIP)));
+                        //listBox1.Invoke(new Action(() => listBox1.Items.Add(DateTime.Now + "  " + (ipAddressBox.Text) + " is " + "UP")));
+                        //listBox1.Invoke(new Action(() => listBox1.Items.Add("Round Trip Time: " + pingInfo)));
+                        //if (pingTimeOut >= 0) { listBox1.Invoke(new Action(() => listBox1.Items.Add(pingTimeOut.ToString() + " milliseconds"))); }
+                        /*
                         try
                         {
-                            if (pingTTL != null || hostIP.AddressFamily != System.Net.Sockets.AddressFamily.InterNetworkV6) { listBox1.Invoke(new Action(() => listBox1.Items.Add("TTL: " + pingTTL))); }
+                            
+                            if (pingTTL != null || hostIP.AddressFamily != System.Net.Sockets.AddressFamily.InterNetworkV6) { listBox1.Invoke(new Action(() => listBox1.Items.Add("TTL: " + pingTTL))); putItem += pingTTL + " "; }
                         }
                         catch (Exception)
                         {
                             //
                         }
+                        */
                         //Get OS Version info if the user selects it
-                        if (attemptOSVersion.Checked == true) { if (osVersion != null) { listBox1.Invoke(new Action(() => listBox1.Items.Add("OS: " + osVersion))); } }
-                        listBox1.Invoke(new Action(() => listBox1.Items.Add(" ")));
+                        if (attemptOSVersion.Checked == true) { if (osVersion != null) { osLabel.Invoke(new Action(() => osLabel.Text = "OS: " + osVersion)); putItem += osVersion + " "; } }
+                        //listBox1.Invoke(new Action(() => listBox1.Items.Add(" ")));
 
                         //Set max timeout
                         if(Convert.ToInt32(maxTimeOutCounter.Text) < pingTimeOut)
                         {
                             maxTimeOutCounter.Invoke(new Action(() => maxTimeOutCounter.Text = pingTimeOut.ToString()));
+                            putItem += pingTimeOut.ToString() + " ";
                         }
+
+                        //listBox1.Invoke(new Action(() => listBox1.Items.Add(putItem)));
                     }
                     
 
@@ -261,9 +286,10 @@ namespace MonitorNodes
                 {
                     this.Invoke(new Action(() => this.BackColor = System.Drawing.Color.Red));
                     //invoke because this is in another thread!
-                    listBox1.Invoke(new Action(() => listBox1.Items.Add("IP Address: " + hostIP)));
-                    listBox1.Invoke(new Action(() => listBox1.Items.Add(DateTime.Now + "  " + (ipAddressBox.Text) + " is " + "DOWN")));
-                    listBox1.Invoke(new Action(() => listBox1.Items.Add(" ")));
+                    dgv1.Invoke(new Action(() => dgv1.Rows.Add("Down", DateTime.Now, null, null, null)));
+                    //listBox1.Invoke(new Action(() => listBox1.Items.Add("IP Address: " + hostIP)));
+                    //listBox1.Invoke(new Action(() => listBox1.Items.Add(DateTime.Now + "  " + (ipAddressBox.Text) + " is " + "DOWN")));
+                    //listBox1.Invoke(new Action(() => listBox1.Items.Add(" ")));
                     //Tick fail
                     failCounter.Invoke(new Action(() => failCounter.Text = (Convert.ToInt32(failCounter.Text) + 1).ToString()));
                 }
@@ -305,10 +331,12 @@ namespace MonitorNodes
         {
             string sPath = "output.txt";
             System.IO.StreamWriter SaveFile = new System.IO.StreamWriter(sPath);
+            /*
             foreach (var item in listBox1.Items)
             {
                 SaveFile.WriteLine(item.ToString());
             }
+            */
             SaveFile.Close();
 
             //Null items
@@ -354,7 +382,7 @@ namespace MonitorNodes
                 try
                 {
                     //This will display the message to the user letting them know the program is getting the OS
-                    listBox1.Items.Add("Trying to get OS information, this may take a second or two");
+                    //listBox1.Items.Add("Trying to get OS information, this may take a second or two");
                     //Check to see if the port is open before you access the registry, if not the .NET API will freeze and sometimes crash
                         
                         using (var reg = Microsoft.Win32.RegistryKey.OpenRemoteBaseKey(Microsoft.Win32.RegistryHive.LocalMachine, ipAddress))
@@ -393,7 +421,8 @@ namespace MonitorNodes
 
         private void button2_Click(object sender, EventArgs e)
         {
-            listBox1.Items.Clear();
+            dgv1.Rows.Clear();
+            //listBox1.Items.Clear();
             succeedCounter.Text = "0";
             failCounter.Text = "0";
             updateChart();
@@ -447,10 +476,12 @@ namespace MonitorNodes
         {
             //string sPath = path;
             System.IO.StreamWriter SaveFile = new System.IO.StreamWriter(path);
+            /*
             foreach (var item in listBox1.Items)
             {
                 SaveFile.WriteLine(item.ToString());
             }
+            */
             SaveFile.Close();
             SaveFile = null;
         }
@@ -459,10 +490,12 @@ namespace MonitorNodes
             //string sPath = path;
             //Save text file
             System.IO.StreamWriter SaveFile = new System.IO.StreamWriter(path);
+            /*
             foreach (var item in listBox1.Items)
             {
                 SaveFile.WriteLine(item.ToString());
             }
+            */
             SaveFile.Close();
 
             //Save image
@@ -494,7 +527,8 @@ namespace MonitorNodes
                     break;
 
                 case "C":
-                    listBox1.Items.Clear();
+                    dgv1.Rows.Clear();
+                    //listBox1.Items.Clear();
                     succeedCounter.Text = "0";
                     failCounter.Text = "0";
                     updateChart();
@@ -636,35 +670,6 @@ namespace MonitorNodes
             */
         }
 
-        //This is to copy what ever the user selects into the clipboard
-        private void listBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            String strItem;
-            string copyto = null;
-            foreach (Object selecteditem in listBox1.SelectedItems)
-            {
-                strItem = (selecteditem as String) + Environment.NewLine;
-                copyto = copyto + strItem;
-                
-                //Process(strItem);
-            }
-            Clipboard.SetText(copyto);
-            
-            copyto = null;
-            strItem = null;
-        }
-
-        //Help Tips!
-        private void listBox1_MouseHover(object sender, EventArgs e)
-        {
-            t1.Show("Select one or multiple lines to copy to clipboard", listBox1);
-        }
-
-        private void pingChart_MouseLeave(object sender, EventArgs e)
-        {
-            t1.Hide(listBox1);
-            
-        }
 
         //This will change the text green if what they provide is a valid IP, will check as typing
         private void ipAddressBox_KeyDown(object sender, KeyEventArgs e)
@@ -804,6 +809,7 @@ namespace MonitorNodes
         {
             System.Diagnostics.Process.Start("https://github.com/martinoj2009/Monitor-Node/blob/master/MonitorNodes/Form1.cs");
         }
+
     }
 
 
